@@ -2,7 +2,6 @@ import os
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes, CallbackContext
 import requests
-import pprint
 from dotenv import load_dotenv
 
 API_KEY = None
@@ -58,6 +57,13 @@ async def dvmn_long_polling(context: CallbackContext):
 
                 elif response_data['status'] == 'timeout':
                     timestamp = response_data['timestamp_to_request']
+
+            except requests.exceptions.ReadTimeout:
+                continue
+
+            except requests.exceptions.ConnectionError:
+                await context.bot.send_message(chat_id=chat_id, text="Проблемы с соединением, попытка переподключения...")
+                continue
 
             except Exception as e:
                 await context.bot.send_message(chat_id=chat_id, text=f"Произошла ошибка: {str(e)}")
