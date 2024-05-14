@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 
 API_KEY = None
 DEVMAN_TOKEN = None
-user_chat_ids = {}  # Temporary storage for chat_id of users
-confirmed_chat_ids = {}  # Storage for confirmed chat_id
+user_chat_ids = {}
+confirmed_chat_ids = {}
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_chat_ids[update.effective_user.username] = update.effective_chat.id
@@ -42,10 +42,10 @@ async def dvmn_long_polling(context: CallbackContext):
             try:
                 params = {'timestamp': timestamp} if timestamp else {}
                 response = requests.get(url, headers=headers, params=params, timeout=90)
-                response_json = response.json()
+                response_data = response.json()
 
-                if response_json['status'] == 'found':
-                    for attempt in response_json['new_attempts']:
+                if response_data['status'] == 'found':
+                    for attempt in response_data['new_attempts']:
                         lesson_title = attempt['lesson_title']
                         lesson_url = attempt.get('lesson_url', '#')
                         result_text = 'требуются доработки' if attempt['is_negative'] else 'успешно принят'
@@ -56,8 +56,8 @@ async def dvmn_long_polling(context: CallbackContext):
                         await context.bot.send_message(chat_id=chat_id, text=message, parse_mode='Markdown')
                         timestamp = attempt['timestamp']
 
-                elif response_json['status'] == 'timeout':
-                    timestamp = response_json['timestamp_to_request']
+                elif response_data['status'] == 'timeout':
+                    timestamp = response_data['timestamp_to_request']
 
             except Exception as e:
                 await context.bot.send_message(chat_id=chat_id, text=f"Произошла ошибка: {str(e)}")
