@@ -79,7 +79,6 @@ def main():
     app = Application.builder().token(API_KEY).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("confirm", confirm))
-    app.run_polling()
 
 if __name__ == '__main__':
     main()
